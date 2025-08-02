@@ -3,33 +3,83 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class AdvancedCurrencyConverter {
-    private static final Map<String, Double> RATES = new HashMap<>();
+
+    private static final Map<String, Double> currencyRates = new HashMap<>();
+    private static final Map<String, String> currencyNames = new HashMap<>();
 
     static {
-        RATES.put("USD", 1.0);
-        RATES.put("EUR", 0.85);
-        RATES.put("GBP", 0.75);
-        RATES.put("JPY", 110.0);
-        RATES.put("CNY", 6.75);
-        RATES.put("INR", 0.98);
+        currencyRates.put("USD", 1.0);
+        currencyRates.put("EUR", 0.85);
+        currencyRates.put("GBP", 0.75);
+        currencyRates.put("JPY", 110.0);
+        currencyRates.put("CNY", 6.75);
+        currencyRates.put("INR", 83.0);
+
+        currencyNames.put("USD", "US Dollar");
+        currencyNames.put("EUR", "Euro");
+        currencyNames.put("GBP", "British Pound");
+        currencyNames.put("JPY", "Japanese Yen");
+        currencyNames.put("CNY", "Chinese Yuan");
+        currencyNames.put("INR", "Indian Rupee");
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Enter the amount you want to convert:");
+        // Welcome message
+        System.out.println("-------------------------------------------------");
+        System.out.println("         Welcome to Currency Converter");
+        System.out.println("-------------------------------------------------");
+
+        displaySupportedCurrencies();
+
+        // Step 1: Ask for original currency
+        System.out.print("Enter the currency code you have (e.g. USD, INR): ");
+        String fromCurrency = scanner.next().toUpperCase();
+        if (!currencyRates.containsKey(fromCurrency)) {
+            System.out.println("Invalid original currency code.");
+            return;
+        }
+
+        // Step 2: Ask for amount
+        System.out.print("Enter the amount to convert: ");
         double amount = scanner.nextDouble();
 
-        System.out.println("Enter the currency code of the original currency (e.g.,INR, USD, EUR, GBP, JPY, CNY):");
-        String originalCurrency = scanner.next();
+        // Step 3: Ask for target currency
+        System.out.print("Enter the currency code you want to convert to: ");
+        String toCurrency = scanner.next().toUpperCase();
+        if (!currencyRates.containsKey(toCurrency)) {
+            System.out.println("Invalid target currency code.");
+            return;
+        }
 
-        System.out.println("Enter the currency code of the target currency (e.g.,INR, USD, EUR, GBP, JPY, CNY):");
-        String targetCurrency = scanner.next();
+        // Conversion
+        double convertedAmount = convertCurrency(amount, fromCurrency, toCurrency);
 
-        double originalRate = RATES.get(originalCurrency);
-        double targetRate = RATES.get(targetCurrency);
+        // Result
+        System.out.println();
+        System.out.printf("%.2f %s (%s) = %.2f %s (%s)%n",
+                amount, fromCurrency, currencyNames.get(fromCurrency),
+                convertedAmount, toCurrency, currencyNames.get(toCurrency));
+    }
 
-        double convertedAmount = amount * targetRate / originalRate;
-        System.out.printf("The converted amount is: %.2f %s%n", convertedAmount, targetCurrency);
+    private static double convertCurrency(double amount, String from, String to) {
+        double rateFrom = currencyRates.get(from);
+        double rateTo = currencyRates.get(to);
+        return (amount / rateFrom) * rateTo;
+    }
+
+    private static void displaySupportedCurrencies() {
+        System.out.println();
+        System.out.println("Supported Currency Codes:");
+        System.out.println("--------------------------------------------");
+        System.out.println(" Code   | Currency Name       | Rate (per USD)");
+        System.out.println("--------------------------------------------");
+        for (String code : currencyRates.keySet()) {
+            System.out.printf(" %-6s | %-20s | %.2f%n",
+                    code, currencyNames.get(code), currencyRates.get(code));
+        }
+        System.out.println("--------------------------------------------");
+        System.out.println();
     }
 }
